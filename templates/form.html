@@ -1,0 +1,57 @@
+<!-- templates/form.html -->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Itinerary Generator</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding:20px; }
+    label { display:block; margin-top:10px; }
+    select, input { padding:6px; width:300px; }
+    button { margin-top:12px; padding:8px 14px; }
+  </style>
+</head>
+<body>
+  <h2>Itinerary Generator</h2>
+  <form method="post" action="/generate_pdf">
+    <label>States (choose at least one):</label>
+    <select name="states" multiple size="6">
+      {% for s in states %}
+        <option value="{{ s }}">{{ s }}</option>
+      {% endfor %}
+    </select>
+
+    <label>Regions (type exact region names from DB - multiple allowed)</label>
+    <input type="text" name="regions" placeholder="Comma-separated region names" />
+
+    <label>Days</label>
+    <input type="number" name="days" value="3" min="1" max="14" />
+
+    <label>Season</label>
+    <select name="season">
+      <option>summer</option><option>winter</option><option>spring</option><option>fall</option>
+    </select>
+
+    <label>Trip type</label>
+    <select name="trip_type">
+      <option>solo</option><option>family</option><option>friends</option><option>couple</option>
+    </select>
+
+    <label>Themes (comma separated)</label>
+    <input type="text" name="themes" value="sightseeing, nature" />
+
+    <label>Budget</label>
+    <select name="budget">
+      <option>low</option><option selected>mid</option><option>high</option>
+    </select>
+
+    <label>Target places</label>
+    <input type="number" name="target_places" value="5" />
+
+    <div>
+      <button type="submit">Generate PDF</button>
+    </div>
+  </form>
+  <p style="color:#666; margin-top:12px">Notes: Regions input is free text here (you can enhance this form to fetch region options via AJAX using /get_regions).</p>
+</body>
+</html>
