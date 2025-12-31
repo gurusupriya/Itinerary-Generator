@@ -1,225 +1,261 @@
-<!-- templates/pdf_template.html -->
 <!doctype html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <title>Itinerary PDF</title>
-  <style>
-    @page { size: A4; margin: 14mm; }
-    body { font-family: 'Helvetica', Arial, sans-serif; color:#222; margin:0; padding:0; }
-    .container { padding: 10px 6mm; }
+<meta charset="utf-8" />
+<title>Itinerary PDF</title>
 
-    /* header */
-    .header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; }
-    .title-left { max-width:60%; }
-    .title-small { color:#b76e3a; font-family: Georgia, serif; font-size:26px; margin-bottom:4px; }
-    .title-big { color:#2a2a72; font-size:56px; font-weight:800; letter-spacing:2px; margin-top:-6px; }
-    .meta { display:flex; gap:20px; margin-top:10px; }
-    .meta-col { flex:1; }
-    .meta-label { font-size:12px; color:#333; margin-bottom:4px; }
-    .meta-line { border-bottom:1px solid #bdbdbd; padding:6px 0; min-height:20px; font-size:13px; }
+<style>
+  @page { size: A4; margin: 14mm; }
+  body { font-family: Helvetica, Arial, sans-serif; color:#222; margin:0; padding:0; }
 
-    .header-right img { max-width:260px; height:auto; display:block; }
+  /* HEADER */
+  .header { width:100%; display:table; margin-bottom:12px; }
+  .header-left { display:table-cell; width:60%; vertical-align:top; }
+  .header-right { display:table-cell; width:40%; text-align:right; vertical-align:top; }
 
-    hr { border:0; border-top:1px solid #eee; margin: 12px 0; }
+  .title-small { color:#b76e3a; font-family:Georgia, serif; font-size:28px; margin-bottom:2px; }
+  .title-big { color:#2a2a72; font-size:62px; font-weight:800; margin:0; letter-spacing:2px; }
 
-    /* Day block */
-    .day {
-  margin-bottom:18px;
-  display:flex;
-  flex-direction:row;
-  gap:20px;
-  align-items:flex-start;
-  width:100%;
-  page-break-inside:avoid;
-}
+  .meta-grid { margin-top:12px; display:table; width:100%; }
+  .meta-col { display:table-cell; width:50%; vertical-align:top; padding-right:20px; }
+  .meta-label { font-size:13px; color:#333; margin-bottom:4px; font-weight:600; }
+  .meta-line { border-bottom:1px solid #bdbdbd; padding:7px 0; min-height:20px; font-size:13px; }
 
-    .day-title { color:#2a2a72; font-weight:800; font-size:18px; margin-bottom:8px; }
-    .block-divider { font-weight:700; color:#444; margin:12px 0 6px 0; padding-top:6px; border-top:0; }
-    .block-divider .bar { display:block; color:#2a2a72; font-weight:800; font-size:12px; letter-spacing:1px; margin-bottom:6px; }
+  /* SUMMARY BLOCK */
+  .summary-block {
+    padding:12px;
+    background:#fdf5ea;
+    border-radius:12px;
+    margin-bottom:18px;
+    page-break-inside:avoid;
+  }
+  .summary-title {
+    font-size:19px;
+    font-weight:800;
+    color:#2a2a72;
+    margin-bottom:10px;
+  }
+  .summary-row { font-size:13px; line-height:1.45; margin-bottom:4px; }
 
-    .section { margin-left:6px; margin-bottom:6px; font-size:12.8px; color:#333; line-height:1.4; }
-    .bullet { margin-left:8px; }
-    .sub { margin-left:18px; color:#444; font-size:12px; }
+  /* DAY CARDS */
+  .day-block {
+    padding:12px;
+    background:#f7e9d7;
+    border-radius:12px;
+    margin-bottom:18px;
+    page-break-inside: avoid;
+  }
 
-    .travel-sentence { font-style:normal; margin-left:6px; color:#333; font-size:12.6px; margin-top:6px; }
+  .day-title {
+    font-size:22px;
+    font-weight:800;
+    color:#2a2a72;
+    margin-bottom:12px;
+  }
 
-    .tips { margin-top:6px; font-size:12px; color:#444; }
+  .day-table { width:100%; border-collapse:collapse; table-layout:fixed; }
+  .day-table td { vertical-align:top; padding:6px; }
 
-    /* extras section */
-    .extras { margin-top:8px; padding-top:10px; border-top:1px dashed #ddd; }
-    .extras h3 { color:#2a2a72; font-size:15px; margin-bottom:6px; }
+  .img-wrap {
+    width:200px;
+    height:180px;
+    border-radius:120px 120px 22px 22px;
+    overflow:hidden;
+    box-shadow:0 2px 6px rgba(0,0,0,0.18);
+  }
+  .img-wrap img { width:100%; height:100%; object-fit:cover; }
 
-    footer { margin-top:12px; font-size:11px; color:#666; text-align:right; }
+  /* Slot sections */
+  .slot-title {
+    font-weight:700;
+    color:#b76e3a;
+    font-size:15px;
+    margin-top:6px;
+    margin-bottom:4px;
+  }
 
-    /* small print */
-    .muted { color:#666; font-size:11px; }
+  .slot-desc ul {
+    margin:0;
+    padding-left:18px;
+  }
+  .slot-desc ul li {
+    font-size:12.5px;
+    margin-bottom:3px;
+    line-height:1.35;
+    color:#444;
+  }
 
-  </style>
+  .tips { font-size:12px; color:#444; margin-top:10px; }
+
+  /* EXTRAS SECTION */
+  .section-wrap { margin-top:20px; }
+  .section { margin-bottom:18px; }
+  .section h3 { color:#2a2a72; margin-bottom:6px; font-size:19px; font-weight:800; }
+  .section p { margin:0; font-size:13.5px; line-height:1.45; white-space:pre-line; }
+
+  footer { margin-top:12px; font-size:11px; color:#666; text-align:right; }
+</style>
 </head>
+
 <body>
-  <div class="container">
-    <div class="header">
-      <div class="title-left">
-        <div class="title-small">Travel</div>
-        <div class="title-big">ITINERARY</div>
 
-        <div class="meta">
-          <div class="meta-col">
-            <div class="meta-label">Destination :</div>
-            <div class="meta-line">{{ destination }}</div>
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="title-small">Travel Planner</div>
+    <div class="title-big">ITINERARY</div>
 
-            <div class="meta-label" style="margin-top:8px;">Date :</div>
-            <div class="meta-line">{{ date }}</div>
-          </div>
-
-          <div class="meta-col">
-            <div class="meta-label">Duration :</div>
-            <div class="meta-line">{{ duration }}</div>
-
-            <div class="meta-label" style="margin-top:8px;">Departure :</div>
-            <div class="meta-line">{{ departure }}</div>
-          </div>
-        </div>
+    <div class="meta-grid">
+      <div class="meta-col">
+        <div class="meta-label">Destination:</div>
+        <div class="meta-line">{{ destination }}</div>
       </div>
 
-      <div class="header-right">
-        {% if header_image_url %}
-          <img src="{{ header_image_url }}" alt="header">
-        {% endif %}
+      <div class="meta-col">
+        <div class="meta-label">Duration:</div>
+        <div class="meta-line">{{ duration }}</div>
       </div>
     </div>
-
-    <hr>
-
-    {# Summary block if present #}
-    {% if summary %}
-      <div class="day">
-        <div class="day-title">SUMMARY</div>
-        <div class="section">
-          <strong>Total places:</strong> {{ summary.total_places | default('') }}<br>
-          <strong>Places:</strong>
-          {% if summary.places %}
-            {{ summary.places | join(', ') }}
-          {% endif %}
-          <br>
-          <strong>Theme coverage:</strong>
-          {% if summary.theme_coverage %}
-            Sightseeing {{ summary.theme_coverage.sightseeing }},
-            Museums {{ summary.theme_coverage.museums }},
-            Nature {{ summary.theme_coverage.nature }}
-          {% endif %}
-          <div class="tips">{{ summary.excitement_note | default('') }}</div>
-        </div>
-      </div>
-      <hr>
-    {% endif %}
-
-    <!-- DAYWISE -->
-    <!-- DAYWISE -->
-{% for d in daywise %}
-  <div class="day" style="display:flex; gap:20px; align-items:flex-start;">
-
-    <!-- LEFT SIDE IMAGE -->
-    <div style="width:32%;">
-      {% if d.day_image %}
-        <img src="{{ d.day_image }}" 
-             style="width:100%; height:200px; border-radius:150px 150px 0 0; object-fit:cover;">
-      {% else %}
-        <div style="width:100%; height:180px; background:#ddd; border-radius:150px 150px 0 0;"></div>
-      {% endif %}
-    </div>
-
-    <!-- RIGHT SIDE ITINERARY -->
-    <div style="width:68%;">
-      <div class="day-title">{{ d.title }}</div>
-
-      <div class="block-divider">
-        <span class="bar">────────── MORNING ──────────</span>
-      </div>
-      <div class="section">
-        {% if d.morning.early_place %}
-          <div><strong>• Early Morning Place (optional):</strong> {{ d.morning.early_place }}</div>
-        {% endif %}
-        <div><strong>• Breakfast:</strong> {{ d.morning.breakfast }}</div>
-        <div><strong>• Place To Visit:</strong> {{ d.morning.place_to_visit }}</div>
-        <div><strong>• Duration:</strong> {{ d.morning.duration }}</div>
-        <div class="travel-sentence"><strong>• Travel to next spot:</strong> {{ d.morning.transport_to_next }}</div>
-      </div>
-
-      <div class="block-divider">
-        <span class="bar">────────── AFTERNOON ──────────</span>
-      </div>
-      <div class="section">
-        <div><strong>• Lunch:</strong> {{ d.afternoon.lunch }}</div>
-        <div><strong>• Place To Visit:</strong> {{ d.afternoon.place_to_visit }}</div>
-        <div><strong>• Duration:</strong> {{ d.afternoon.duration }}</div>
-        <div class="travel-sentence"><strong>• Travel to next spot:</strong> {{ d.afternoon.transport_to_next }}</div>
-      </div>
-
-      <div class="block-divider">
-        <span class="bar">────────── NIGHT ──────────</span>
-      </div>
-      <div class="section">
-        <div><strong>• Dinner:</strong> {{ d.evening.dinner }}</div>
-        <div><strong>• Place To Visit:</strong> {{ d.evening.place_to_visit }}</div>
-        <div><strong>• Duration:</strong> {{ d.evening.duration }}</div>
-        <div class="travel-sentence"><strong>• Travel back or next city:</strong> {{ d.evening.transport_to_next }}</div>
-      </div>
-
-      {% if d.day_tips %}
-        <div class="tips"><strong>Day Tip:</strong> {{ d.day_tips }}</div>
-      {% endif %}
-      </div>
-
-      {% if d.transport_note_if_long %}
-        <div class="section" style="margin-top:8px;">
-          <strong>Long travel note:</strong> {{ d.transport_note_if_long }}
-        </div>
-      {% endif %}
-    
-
   </div>
 
-  <hr style="margin:18px 0;">
+  <div class="header-right">
+    {% if header_image_url %}
+    <img src="{{ header_image_url }}" style="max-width:260px;">
+    {% endif %}
+  </div>
+</div>
+
+<!-- SUMMARY (IF AVAILABLE) -->
+{% if summary %}
+<div class="summary-block">
+  <div class="summary-title">TRIP SUMMARY</div>
+
+  <div class="summary-row"><strong>Total Places:</strong> {{ summary.total_places }}</div>
+  <div class="summary-row">
+    <strong>Places:</strong>
+    {% if summary.places %} {{ summary.places | join(', ') }} {% endif %}
+  </div>
+
+  <div class="summary-row">
+    <strong>Theme Coverage:</strong>
+    Sightseeing {{ summary.theme_coverage.sightseeing }},
+    Museums {{ summary.theme_coverage.museums }},
+    Nature {{ summary.theme_coverage.nature }}
+  </div>
+
+  {% if summary.excitement_note %}
+  <div class="summary-row"><em>{{ summary.excitement_note }}</em></div>
+  {% endif %}
+</div>
+{% endif %}
+
+<!-- DAYWISE LOOP -->
+{% for d in daywise %}
+<div class="day-block">
+
+  <div class="day-title"> {{ d.title }}</div>
+
+  <table class="day-table">
+    <tr>
+      <!-- IMAGE -->
+      <td style="width:220px;">
+        <div class="img-wrap">
+          {% if d.day_image %}
+            <img src="{{ d.day_image }}">
+          {% else %}
+            <img src="{{ header_image_url }}">
+          {% endif %}
+        </div>
+      </td>
+
+      <!-- RIGHT CONTENT -->
+      <td>
+
+        <!-- MORNING -->
+        <div class="slot-title">Morning</div>
+        <div class="slot-desc">
+          <ul>
+            {% if d.morning.early_place %}
+            <li><strong>Early Morning (Optional):</strong> {{ d.morning.early_place }}</li>
+            {% endif %}
+            <li><strong>Breakfast:</strong> {{ d.morning.breakfast }}</li>
+            <li><strong>Place To Visit:</strong> {{ d.morning.place_to_visit }}</li>
+            <li><strong>Duration:</strong> {{ d.morning.duration }}</li>
+            <li><strong>Travel:</strong> {{ d.morning.transport_to_next }}</li>
+          </ul>
+        </div>
+
+        <!-- AFTERNOON -->
+        <div class="slot-title">Afternoon</div>
+        <div class="slot-desc">
+          <ul>
+            <li><strong>Lunch:</strong> {{ d.afternoon.lunch }}</li>
+            <li><strong>Place To Visit:</strong> {{ d.afternoon.place_to_visit }}</li>
+            <li><strong>Duration:</strong> {{ d.afternoon.duration }}</li>
+            <li><strong>Travel:</strong> {{ d.afternoon.transport_to_next }}</li>
+          </ul>
+        </div>
+
+        <!-- NIGHT -->
+        <div class="slot-title">Night</div>
+        <div class="slot-desc">
+          <ul>
+            <li><strong>Dinner:</strong> {{ d.evening.dinner }}</li>
+            <li><strong>Place To Visit:</strong> {{ d.evening.place_to_visit }}</li>
+            <li><strong>Duration:</strong> {{ d.evening.duration }}</li>
+            <li><strong>Travel Back:</strong> {{ d.evening.transport_to_next }}</li>
+          </ul>
+        </div>
+
+        {% if d.day_tips %}
+        <div class="tips"><strong>Day Tip:</strong> {{ d.day_tips }}</div>
+        {% endif %}
+
+        {% if d.transport_note_if_long %}
+        <div class="tips"><strong>Travel Note:</strong> {{ d.transport_note_if_long }}</div>
+        {% endif %}
+
+      </td>
+    </tr>
+  </table>
+
+</div>
 {% endfor %}
 
+<!-- EXTRAS -->
+<div class="section-wrap">
 
-    <div class="extras">
-      <div class="section">
-        <h3>Famous Shopping Recommendations</h3>
-        <div class="sub">{{ extras.famous_shopping | default('Local markets and downtown shops for souvenirs.') }}</div>
-      </div>
-
-      <div class="section">
-        <h3>What to Pack</h3>
-        <div class="sub">{{ extras.what_to_pack | default('Comfortable shoes, sunscreen, light jacket, power bank.') }}</div>
-      </div>
-
-      <div class="section">
-        <h3>Safety Rules</h3>
-        <div class="sub">{{ extras.safety_rules | default('Secure valuables, avoid poorly lit areas at night, use licensed taxis.') }}</div>
-      </div>
-
-      <div class="section">
-        <h3>Extra Travel Tips</h3>
-        <div class="sub">{{ extras.extra_travel_tips | default('Book popular attractions ahead, carry water, use offline maps.') }}</div>
-      </div>
-
-      <div class="section">
-        <h3>Estimated Total Budget</h3>
-        <div class="sub">{{ extras.estimated_total_budget | default('Approx: $200 - $800 per person depending on choices.') }}</div>
-      </div>
-
-      <div class="section">
-        <h3>Closing Note</h3>
-        <div class="sub">{{ extras.closing_note | default('Have an amazing trip — explore, relax, and take photos!') }}</div>
-      </div>
-    </div>
-
-    <footer>
-    
-    </footer>
+  <div class="section">
+    <h3>Famous Shopping Recommendations 🛍️</h3>
+    <p>{{ extras.famous_shopping | default('Local markets and downtown shops for souvenirs.') }}</p>
   </div>
+
+  <div class="section">
+    <h3>What to Pack 🎒</h3>
+    <p>{{ extras.what_to_pack | default('Comfortable shoes, sunscreen, light jacket, power bank.') }}</p>
+  </div>
+
+  <div class="section">
+    <h3>Safety Rules 🔒</h3>
+    <p>{{ extras.safety_rules | default('Secure valuables, avoid poorly lit areas at night, use licensed taxis.') }}</p>
+  </div>
+
+  <div class="section">
+    <h3>Extra Travel Tips ✈️</h3>
+    <p>{{ extras.extra_travel_tips | default('Book popular attractions ahead, carry water, use offline maps.') }}</p>
+  </div>
+
+  <div class="section">
+    <h3>Estimated Total Budget 💵</h3>
+    <p>{{ extras.estimated_total_budget | default('Approx: $200 - $800 per person depending on choices.') }}</p>
+  </div>
+
+  <div class="section">
+    <h3>Closing Note ✨</h3>
+    <p>{{ extras.closing_note | default('Have an amazing trip — explore, relax, and take photos!') }}</p>
+  </div>
+
+</div>
+
 </body>
 </html>
